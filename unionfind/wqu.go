@@ -1,4 +1,4 @@
-package main
+package unionfind
 
 type UnionFind interface {
 	union(a, b int)
