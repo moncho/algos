@@ -19,8 +19,8 @@ const block = string('\u2589')
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	rows := 1 + rand.Intn(100)
-	cols := 1 + rand.Intn(200)
+	rows := 1 + rand.Intn(10)
+	cols := 1 + rand.Intn(20)
 	grid := randomGrid(rows, cols, len(colors))
 
 	printGrid(grid)
