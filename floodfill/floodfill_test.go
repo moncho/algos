@@ -1,8 +1,12 @@
 package main
 
-import "testing"
+import (
+	"math/rand"
+	"testing"
+	"time"
+)
 
-func Test_maxConsecutiveValues(t *testing.T) {
+func TestMaxConsecutiveValues(t *testing.T) {
 
 	type expected struct {
 		value int
@@ -44,37 +48,32 @@ func Test_maxConsecutiveValues(t *testing.T) {
 				t.Errorf("maxConsecutiveValues() value got = %v, want %v", gotValue, tt.expected.value)
 			}
 			if gotCount != tt.expected.count {
-				t.Errorf("maxConsecutiveValues() count got1 = %v, want %v", gotCount, tt.expected.count)
+				t.Errorf("maxConsecutiveValues() count got = %v, want %v", gotCount, tt.expected.count)
 			}
 		})
 	}
 }
 
-func BenchmarkMaxConsecutiveValues10x5(b *testing.B) {
-	grid := randomGrid(10, 5, 3)
-	var value, max int
-	for n := 0; n < b.N; n++ {
-		value, max = maxConnectedValue(grid)
-	}
-	_ = value
-	_ = max
-}
-func BenchmarkMaxConsecutiveValues100x100(b *testing.B) {
-	grid := randomGrid(100, 100, 3)
-	var value, max int
-	for n := 0; n < b.N; n++ {
-		value, max = maxConnectedValue(grid)
-	}
-	_ = value
-	_ = max
-}
+func BenchmarkMaxConsecutiveValues(b *testing.B) {
 
-func BenchmarkMaxConsecutiveValues1000x1000(b *testing.B) {
-	grid := randomGrid(1000, 1000, 3)
-	var value, max int
-	for n := 0; n < b.N; n++ {
-		value, max = maxConnectedValue(grid)
+	benchmarks := []struct {
+		name          string
+		rows, columns int
+	}{
+		{"10x5", 10, 5},
+		{"100x100", 100, 100},
+		{"1000x1000", 1000, 1000},
 	}
-	_ = value
-	_ = max
+	rand.Seed(time.Now().UnixNano())
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			b.StopTimer()
+			grid := randomGrid(bm.rows, bm.columns, 3)
+			b.StartTimer()
+			for i := 0; i < b.N; i++ {
+				maxConnectedValue(grid)
+			}
+		})
+	}
+
 }
