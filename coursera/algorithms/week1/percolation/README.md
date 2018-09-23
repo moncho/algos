@@ -1,0 +1,3 @@
+# Percolation
+
+[Week 1 assignment](http://coursera.cs.princeton.edu/algs4/assignments/percolation.html).
