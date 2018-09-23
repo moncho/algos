@@ -1,8 +1,8 @@
 package unionfind
 
 type UnionFind interface {
-	union(a, b int)
-	connected(a, b int) bool
+	Union(a, b int)
+	Connected(a, b int) bool
 }
 
 type weightedQuickUnion struct {
@@ -10,7 +10,7 @@ type weightedQuickUnion struct {
 	weights []int
 }
 
-func NewWeightedQuickUnion(elements int) weightedQuickUnion {
+func NewWeightedQuickUnion(elements int) UnionFind {
 	roots := make([]int, elements)
 	weights := make([]int, elements)
 
@@ -18,7 +18,7 @@ func NewWeightedQuickUnion(elements int) weightedQuickUnion {
 		roots[i] = i
 		weights[i] = 1
 	}
-	return weightedQuickUnion{
+	return &weightedQuickUnion{
 		roots:   roots,
 		weights: weights,
 	}
@@ -34,18 +34,21 @@ func (qu *weightedQuickUnion) root(a int) int {
 	return root
 }
 
-func (qu *weightedQuickUnion) union(a, b int) {
+func (qu *weightedQuickUnion) Union(a, b int) {
 	rootB := qu.root(b)
-	rootA := qu.root(b)
+	rootA := qu.root(a)
+	if rootB == rootA {
+		return
+	}
 	if qu.weights[rootA] > qu.weights[rootB] {
 		qu.weights[rootA] += qu.weights[rootB]
-		qu.roots[b] = rootA
+		qu.roots[rootB] = rootA
 	} else {
 		qu.weights[rootB] += qu.weights[rootA]
-		qu.roots[a] = rootB
+		qu.roots[rootA] = rootB
 	}
 }
 
-func (qu *weightedQuickUnion) connected(a, b int) bool {
+func (qu *weightedQuickUnion) Connected(a, b int) bool {
 	return qu.root(a) == qu.root(b)
 }
