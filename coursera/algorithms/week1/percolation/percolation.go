@@ -1,4 +1,4 @@
-package percolation
+package main
 
 import (
 	"github.com/moncho/algos/unionfind"
