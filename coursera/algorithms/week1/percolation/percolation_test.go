@@ -8,22 +8,21 @@ import (
 	"testing"
 )
 
-func TestPercolation(t *testing.T) {
-	for _, tc := range testCases(t) {
-		percolates := !strings.Contains(tc, "no")
-		test := testCase(t, tc)
-		lines := strings.Split(test, "\n")
-		n, _ := strconv.Atoi(lines[0])
-		p := NewPercolation(n)
-		for _, line := range lines[1:] {
-			if line == "" {
-				break
-			}
-			rowCol := strings.Fields(line)
-			row, _ := strconv.Atoi(rowCol[0])
-			col, _ := strconv.Atoi(rowCol[1])
+type coord struct {
+	row, col int
+}
+type percolationTest struct {
+	n         int
+	openSites []coord
+}
 
-			p.open(row, col)
+func TestPercolation(t *testing.T) {
+	for _, tc := range testCases(t.Error) {
+		percolates := !strings.Contains(tc, "no")
+		test := loadTestCase(t.Error, tc)
+		p := NewPercolation(test.n)
+		for _, open := range test.openSites {
+			p.open(open.row, open.col)
 		}
 		got := p.percolates()
 		if percolates != got {
@@ -31,10 +30,10 @@ func TestPercolation(t *testing.T) {
 		}
 	}
 }
-func testCases(t *testing.T) []string {
+func testCases(f func(...interface{})) []string {
 	files, err := ioutil.ReadDir("testdata")
 	if err != nil {
-		t.Fatal(err)
+		f(err)
 	}
 	var testCases []string
 	for _, file := range files {
@@ -43,11 +42,42 @@ func testCases(t *testing.T) []string {
 	return testCases
 }
 
-func testCase(t *testing.T, name string) string {
-	path := filepath.Join("testdata", name)
+func loadTestCase(onFail func(args ...interface{}), fileName string) percolationTest {
+	path := filepath.Join("testdata", fileName)
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		t.Fatal(err)
+		onFail(err)
 	}
-	return string(bytes)
+	lines := strings.Split(string(bytes), "\n")
+	n, _ := strconv.Atoi(lines[0])
+	var openSites []coord
+	for _, line := range lines[1:] {
+		if line == "" {
+			break
+		}
+		rowCol := strings.Fields(line)
+		row, _ := strconv.Atoi(rowCol[0])
+		col, _ := strconv.Atoi(rowCol[1])
+		openSites = append(openSites, coord{row, col})
+	}
+	return percolationTest{n, openSites}
+}
+
+var percolates bool
+
+func BenchmarkPercolation(b *testing.B) {
+	for _, tc := range testCases(b.Error) {
+		tc := tc
+		test := loadTestCase(b.Error, tc)
+		b.ResetTimer()
+		b.Run(tc, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				p := NewPercolation(test.n)
+				for _, open := range test.openSites {
+					p.open(open.row, open.col)
+				}
+				percolates = p.percolates()
+			}
+		})
+	}
 }
