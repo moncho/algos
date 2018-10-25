@@ -18,19 +18,19 @@ func BruteCollinearPoints(points []Point) []LineSegment {
 		for q := p + 1; q < pLen-2; q++ {
 			collinear := false
 			slopeTo := points[p].slopeTo(points[q])
-			minPoint, maxPoint := sort(points[p], points[q])
+			minPoint, maxPoint := sortPoints(points[p], points[q])
 			if !isDegenerate(slopeTo) {
 				for r := q + 1; r < pLen-1; r++ {
 					if slopeTo == points[q].slopeTo(points[r]) {
-						loopMin, loopMax := sort(points[q], points[r])
-						minPoint, _ = sort(loopMin, minPoint)
-						_, maxPoint = sort(loopMax, maxPoint)
+						loopMin, loopMax := sortPoints(points[q], points[r])
+						minPoint, _ = sortPoints(loopMin, minPoint)
+						_, maxPoint = sortPoints(loopMax, maxPoint)
 						for s := r + 1; s < pLen; s++ {
 							if slopeTo == points[r].slopeTo(points[s]) {
 								collinear = true
-								loopMin, loopMax = sort(points[r], points[s])
-								minPoint, _ = sort(loopMin, minPoint)
-								_, maxPoint = sort(loopMax, maxPoint)
+								loopMin, loopMax = sortPoints(points[r], points[s])
+								minPoint, _ = sortPoints(loopMin, minPoint)
+								_, maxPoint = sortPoints(loopMax, maxPoint)
 							}
 						}
 					}
@@ -56,7 +56,7 @@ func isNew(slopes []float64, slope float64) bool {
 	return true
 }
 
-func sort(p, q Point) (Point, Point) {
+func sortPoints(p, q Point) (Point, Point) {
 	if p.compareTo(q) <= 0 {
 		return p, q
 	}
