@@ -6,30 +6,34 @@ import (
 
 func FastCollinearPoints(points []Point) []LineSegment {
 	var segments []LineSegment
-
-	for i := 0; i < len(points)-3; i++ {
+	sorted := make([]Point, len(points))
+	copy(sorted, points)
+	for i := 0; i < len(points); i++ {
 		p := points[i]
-		sort.Slice(points, sortBySlopeToPoint(p, points))
-		count := 2
-		minIndex, maxIndex := i, i
-		slopeTo := p.slopeTo(points[1])
+		sort.Slice(sorted, sortBySlopeToPoint(p, sorted))
+		minIndex, maxIndex := 1, 1
+		slopeTo := p.slopeTo(sorted[1])
 		for j := 2; j < len(points); j++ {
-			if slopeTo == p.slopeTo(points[j]) {
-				count++
+			if slopeTo == p.slopeTo(sorted[j]) {
 				maxIndex = j
 			} else {
+				if maxIndex-minIndex >= 2 && p.compareTo(sorted[minIndex]) < 0 {
+					segments = append(segments, LineSegment{
+						p,
+						sorted[maxIndex],
+					})
+				}
 				minIndex = j
-				count = 2
+				slopeTo = p.slopeTo(sorted[j])
 			}
-			slopeTo = p.slopeTo(points[j])
 		}
-		if count >= 4 {
+		if maxIndex-minIndex >= 2 && p.compareTo(sorted[minIndex]) < 0 {
 			segments = append(segments, LineSegment{
-				points[minIndex],
-				points[maxIndex],
+				p,
+				sorted[maxIndex],
 			})
-			i = maxIndex
 		}
+
 	}
 	return segments
 }
