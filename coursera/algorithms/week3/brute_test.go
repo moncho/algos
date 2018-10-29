@@ -69,3 +69,30 @@ func TestBruteCollinearPoints(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkBruteCollinearPoints(b *testing.B) {
+	var got []LineSegment
+	for _, test := range tests {
+		b.Run(test.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				got = BruteCollinearPoints(test.args.points)
+			}
+		})
+	}
+	_ = got
+}
+
+func BenchmarkBruteCollinearPoints_largeInputs(b *testing.B) {
+	var got []LineSegment
+	tests := testFiles(b)
+	for _, test := range tests {
+		points := loadTest(test, b)
+		b.Run(test, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				got = BruteCollinearPoints(points)
+			}
+		})
+	}
+	_ = got
+}

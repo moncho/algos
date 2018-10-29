@@ -13,11 +13,10 @@ func (p Point) slopeTo(that Point) float64 {
 		if p.Y == that.Y {
 			return math.Inf(-1)
 		}
-		return 0
-	} else if p.Y == that.Y {
 		return math.Inf(1)
+	} else if p.Y == that.Y {
+		return 0
 	}
-
 	return float64(that.Y-p.Y) / float64(that.X-p.X)
 }
 
@@ -37,18 +36,15 @@ func (p Point) compareTo(that Point) int {
 }
 
 /**
- * Compares two points by the slope they make with this point. The slope is defined as in the
- * slopeTo() method.
- *
+ * Sorts the given points by the slope they make with this point.
  */
-func slopeOrder(o1, o2 Point) int {
-	slopeTo := o1.slopeTo(o2)
-	if math.IsInf(slopeTo, 1) || math.IsInf(slopeTo, -1) {
-		return 0
-	} else if slopeTo > 0 {
-		return 1
-	} else if slopeTo < 0 {
-		return -1
+func (p Point) slopeOrder(pp []Point) func(i, j int) bool {
+	return func(i, j int) bool {
+		iSlope := p.slopeTo(pp[i])
+		jSlope := p.slopeTo(pp[j])
+		if iSlope == jSlope {
+			return pp[i].compareTo(pp[j]) < 0
+		}
+		return iSlope < jSlope
 	}
-	return 0
 }

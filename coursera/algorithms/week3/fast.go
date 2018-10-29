@@ -10,7 +10,7 @@ func FastCollinearPoints(points []Point) []LineSegment {
 	copy(sorted, points)
 	for i := 0; i < len(points); i++ {
 		p := points[i]
-		sort.Slice(sorted, sortBySlopeToPoint(p, sorted))
+		sort.Slice(sorted, p.slopeOrder(sorted))
 		minIndex, maxIndex := 1, 1
 		slopeTo := p.slopeTo(sorted[1])
 		for j := 2; j < len(points); j++ {
